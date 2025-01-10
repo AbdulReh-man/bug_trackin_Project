@@ -1,0 +1,20 @@
+<p style="color: green"><%= notice %></p>
+
+<h1><%= @project.name %></h1>
+
+<table class="table" id="projects">
+  <thead>
+    <tr>
+      <th scope="col"><strong>Name</strong></th>
+      <th scope="col"><strong>Description</strong></th>
+      <th scope="col"><strong>Actions</strong></th>
+    </tr>
+    <%= render @project %>
+ </thead>
+  <tbody>
+</table>
+
+<div>
+   <%= link_to "All Project", projects_path ,:class=>('btn btn-dark')%>
+</div>
+

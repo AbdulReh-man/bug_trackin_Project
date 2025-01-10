@@ -1,0 +1,33 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Bugs" %>
+
+<h1>Bugs</h1>
+
+<table class="table " id="bugs">
+  <thead>
+    <tr>
+      <th scope="col"><strong>Title</strong></th>
+      <th scope="col"><strong>Description</strong></th>
+      <th scope="col"> <strong>Project</strong></th>
+      <th scope="col"><strong>Deadline</strong></th>
+      <th scope="col"><strong>Type</strong></th>
+      <th scope="col"><strong>Status</strong></th>
+      <th scope="col"><strong>Actions</strong></th>
+    </tr>
+  <% @bugs.each do |bug| %>
+    <%= render bug %>
+  <% end %>
+ </thead>
+  <tbody>
+</table>
+
+<div>
+  
+    <% if policy(Bug).create?%>
+    <%= link_to "New Bug", new_project_bug_path , :class=>('btn btn-primary')%>
+    <%end%>
+    <%= link_to "New Bug", new_project_bug_path , :class=>('btn btn-primary')%>
+    
+    <%= link_to "Back to Project", project_path(@project) ,:class=>('btn btn-dark')%>
+</div>

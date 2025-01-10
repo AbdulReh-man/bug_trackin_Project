@@ -1,0 +1,20 @@
+<p style="color: green"><%= notice %></p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col"><strong>Title</strong></th>
+      <th scope="col"><strong>Description</strong></th>
+      <th scope="col"> <strong>Project</strong></th>
+      <th scope="col"><strong>Deadline</strong></th>
+      <th scope="col"><strong>Type</strong></th>
+      <th scope="col"><strong>Status</strong></th>
+    </tr>
+    <%= render @bug %>
+  </thead>
+  <tbody>
+</table>
+
+<div class="d-flex gap-1 p-2">
+  <%= link_to "Back to Bugs", project_bugs_path ,:class=>('btn btn-primary')%>
+</div>

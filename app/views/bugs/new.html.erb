@@ -1,0 +1,11 @@
+<% content_for :title, "New Bug" %>
+
+<h1>New Bug</h1>
+
+<%= render "form", project: @project, bug: @bug %>
+
+<br>
+
+<div>
+  <%= link_to "Back to Bugs", project_bugs_path ,:class=>("btn btn-dark")%>
+</div>

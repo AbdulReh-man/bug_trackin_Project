@@ -1,0 +1,15 @@
+<tr id="<%= dom_id project %>">
+  <td>
+    <%= project.name %>
+  </td>
+  <td>
+    <%= project.description %>
+  </td>
+  <td class="d-flex gap-1 p-2">
+    <%# <%= link_to "Show", project, :class=>("btn btn-info") %>
+    <%= link_to "Edit", edit_project_path(project),:class=>("btn btn-primary") %>
+    <%= button_to "Destroy", project_path(project) , method: :delete , :class=>("btn btn-danger")%>
+     <%= link_to "Show Bugs", project_bugs_path(project) , :class=>("btn btn-dark ")%>
+    <%= link_to "User List", view_users_project_path(project), :class=>( "btn btn-warning") %>
+  </td>
+</tr>

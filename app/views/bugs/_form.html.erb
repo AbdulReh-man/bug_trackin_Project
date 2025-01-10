@@ -1,0 +1,81 @@
+<%= form_with(model:[@project, @bug],  local: false) do |form| %>
+  <% if @bug.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(@bug.errors.count, "error") %> prohibited this bug from being saved:</h2>
+
+      <ul>
+        <% @bug.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :title, style: "display: block"%>
+    <%= form.text_field :title, required: true , :class => 'form-control' %>
+  </div>
+
+  <div>
+    <%= form.label :description, style: "display: block" %>
+    <%= form.text_area :description,required:true, :class => 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :project_id, "Project", style: "display: block" %>
+    <%= form.collection_select :project_id, Project.all, :id, :name, { prompt: "Select a project" }, { class: "live-search form-control" } %>
+  </div>
+
+  <div>
+    <%= form.label :deadline, style: "display: block" %>
+    <%= form.datetime_field :deadline  , :class=> (" form-control") %>
+  </div>
+
+  <div>
+    <%= form.label :bug_type, "Type", style: "display: block" %>
+    <%= form.select :bug_type, [["Feature", "feature"], ["Bug", "bug"]], { prompt: "Select type" }, required: true, id: "bug_type_select" , :class=> ("form-control") %>
+  </div>
+
+  <div>
+    <%= form.label :status, style: "display: block" %>
+    <%= form.select :status, [], { prompt: "Select status" }, required: true, id: "status_select" , :class=> ("form-control") %>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const bugTypeSelect = document.getElementById("bug_type_select");
+      const statusSelect = document.getElementById("status_select");
+
+      function updateStatusOptions() {
+        const bugType = bugTypeSelect.value;
+        let options = [];
+
+        if (bugType === "feature") {
+          options = [["New", "new"], ["Started", "started"], ["Completed", "completed"]];
+        } else if (bugType === "bug") {
+          options = [["New", "new"], ["Started", "started"], ["Resolved", "resolved"]];
+        }
+
+        statusSelect.innerHTML = '<option value="">Select status</option>';
+        options.forEach(function(option) {
+          const opt = document.createElement("option");
+          opt.value = option[1];
+          opt.textContent = option[0];
+          statusSelect.appendChild(opt);
+        });
+      }
+
+      bugTypeSelect.addEventListener("change", updateStatusOptions);
+      updateStatusOptions();
+    });
+  </script>
+
+  <div class="form-group mt-2">
+    <%= form.label :screenshot, "Screenshot (PNG/GIF only)", style: "display: block" %>
+    <%= form.file_field :screenshot, accept: "image/png,image/gif" , :class =>("form-control-file" )%>
+  </div>
+
+  <div>
+    <%= form.submit "Save Bug", :class => "btn btn-primary p-2 mt-3" %>
+  </div>
+<% end %>

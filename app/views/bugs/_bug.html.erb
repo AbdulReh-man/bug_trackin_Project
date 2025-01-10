@@ -1,0 +1,41 @@
+<tr id="<%= dom_id bug %>" class="text-uppercase" >
+  <td>
+    <%= bug.title %>
+  </td>
+
+  <td>
+    <%= bug.description %>
+  </td>
+
+  <td>
+   
+    <%= bug.project_id %>
+  </td>
+
+  <td>
+    
+    <%= bug.deadline %>
+  </td>
+
+  <td>
+    
+    <%= bug.bug_type %>
+  </td>
+
+  <td>
+
+    <%= bug.status %>
+  </td>
+
+  <td class="d-flex gap-1 p-2">
+    <% if policy(Bug).update?%>
+     <%= link_to "Edit", edit_project_bug_path(@project, bug) ,:class=>('btn btn-info') %>
+     <%end%>
+      <%= link_to "Show", project_bug_path(bug.project, bug), :class=>('btn btn-info')  %>
+      <%= button_to "Destroy", project_bug_path(bug.project, bug), method: :delete,:class=>('btn btn-danger') %>
+
+       <% if bug.developer.nil? && policy(Bug).assign_to_self? %>
+         <%= button_to "Assign to Me", assign_user_project_bug_path(bug.project, bug), method: :patch, class: "btn btn-primary" %>
+      <% end %>
+  </td>
+</tr>

@@ -1,0 +1,26 @@
+<h1>Assigned Users for <%= @project.name %></h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td><%= user.email %></td>
+        <td><%= user.role %></td>
+        <td>
+            <%= button_to "Remove", remove_user_project_path(@project, user_id: user.id), method: :delete, data: { confirm: "Are you sure you want to remove this user?"},class: "btn btn-danger"  %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to "Back to Project", project_path(@project), class: "btn btn-dark" %>
+
+<%= link_to "Assign User", assign_users_project_path(@project), method: :post ,class: "btn btn-primary" %>
