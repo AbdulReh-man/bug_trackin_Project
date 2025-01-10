@@ -67,6 +67,7 @@ class ProjectsController < ApplicationController
   end
 
   def assign_users
+    authorize Project
     @project = Project.find(params[:id])
     @users = User.where(role: ['developer', 'qa'])
 
@@ -95,6 +96,7 @@ class ProjectsController < ApplicationController
   end
 
   def remove_user
+    authorize Project
     user = User.find(params[:user_id]) 
     if @project.users.include?(user)
       @project.users.delete(user) 
