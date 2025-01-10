@@ -24,7 +24,11 @@ class ProjectPolicy < ApplicationPolicy
     user.manager? && creator?(record)
   end
 
-  def add_user?
+  def assign_users?
+    user.manager? && creator?(record)
+  end
+
+   def  remove_user?
     user.manager? && creator?(record)
   end
 
