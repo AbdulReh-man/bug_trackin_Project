@@ -1,15 +1,20 @@
 class ProjectsController < ApplicationController
   # before_action :set_project, only: %i[ show edit update destroy ]
   before_action :set_project, only: [:show, :edit, :update, :destroy, :assign_users, :remove_user]
+  
   # GET /projects or /projects.json
   def index
     authorize Project
-    @projects = if current_user.manager?
-                Project.all
-              else
-                 current_user.projects
-              end
-    @projects = policy_scope(@projects)
+    # debugger
+    if current_user.manager?
+      @projects = Project.all
+    else
+      @projects = current_user.projects
+    end
+
+    @projects = policy_scope(@projects).distinct
+    
+    @bug_counts = Bug.group(:bug_type).count
   end
 
   # GET /projects/1 or /projects/1.json
@@ -17,8 +22,9 @@ class ProjectsController < ApplicationController
 
   end
 
-  # GET /projects/new
+  # # GET /projects/new
   def new
+    authorize Project, :create?
     @project = Project.new
   end
 
@@ -30,15 +36,12 @@ class ProjectsController < ApplicationController
   def create
     authorize Project
     @project = Project.new(project_params)
-    respond_to do |format|
-      if @project.save
-        UserProject.create(user: current_user, project: @project)
-        format.html { redirect_to @project, notice: "Project was successfully created." }
-        format.json { render :show, status: :created, location: @project }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @project.errors, status: :unprocessable_entity }
-      end
+    
+    if @project.save
+      UserProject.create(user: current_user, project: @project)
+      redirect_to @project, notice: "Project was successfully created."
+    else
+      render :new, status: :unprocessable_entity 
     end
   end
 
@@ -58,30 +61,24 @@ class ProjectsController < ApplicationController
 
   # DELETE /projects/1 or /projects/1.json
   def destroy
-    authorize set_project
-    @project.destroy!
-    respond_to do |format|
-      format.html { redirect_to projects_path, status: :see_other, notice: "Project was successfully destroyed." }
-      format.json { head :no_content }
+    authorize @project, :destroy?
+    
+    if (@project.destroy)
+      redirect_to projects_path, status: :see_other, notice: "Project was successfully destroyed."
     end
   end
 
+
   def assign_users
+    authorize @project, :add_user?
     @project = Project.find(params[:id])
     @users = User.where(role: ['developer', 'qa'])
-
+  
     if request.post?
-      if params[:user_ids].present?
-        selected_users = User.find(params[:user_ids])
-        manager_users = @project.users.where(role: 'manager')
-          @project.users = manager_users + selected_users 
-
-          selected_users.each do |user|
-            MailJob.perform_async(user.id, @project.id)
-          end
-
-          redirect_to @project, notice: "Users assigned successfully to the project & email sent."
-     
+      service = ProjectUserAssignerService.new(@project, params[:user_ids])
+  
+      if service.call
+        redirect_to @project, notice: "Users assigned successfully to the project & email sent."
       else
         @project.users = @project.users.where(role: 'manager')
         redirect_to @project, alert: "No users selected."
@@ -89,12 +86,14 @@ class ProjectsController < ApplicationController
     end
   end
 
+
   def view_users
     @project = Project.find(params[:id]) 
     @users = @project.users.where.not(role: 'manager')
   end
 
   def remove_user
+    authorize @project, :add_user?
     user = User.find(params[:user_id]) 
     if @project.users.include?(user)
       @project.users.delete(user) 

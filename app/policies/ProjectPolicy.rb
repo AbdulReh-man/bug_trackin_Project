@@ -25,7 +25,7 @@ class ProjectPolicy < ApplicationPolicy
   end
 
   def add_user?
-    user.manager? && creator?(record)
+    user.manager? 
   end
 
   private

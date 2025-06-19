@@ -1,16 +1,19 @@
 class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  protect_from_forgery unless: -> { request.format.json? }
 
+    # Use modern browser features
+    allow_browser versions: :modern
+
+  # Include Pundit for authorization
   include Pundit::Authorization
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-  
+
   private
   def user_not_authorized
     flash[:alert] = "You are not authorized to perform this action."
     redirect_to(request.referrer || root_path) # Redirect to previous page or root
   end
-
 
   before_action :configure_permitted_parameters, if: :devise_controller? # The following code allows the user model to accept `role` as a parameter at the time of signup
   protected

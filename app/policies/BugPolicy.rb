@@ -14,11 +14,12 @@ class BugPolicy < ApplicationPolicy
   end
 
   def create?
-    user.qa? || user.manager?
+    !user.developer?
   end
 
   def update?
-    user.developer? && record.developer == user || user.manager?
+    !user.qa?
+    # user.developer? || user.manager?
   end
 
   def destroy?
@@ -26,7 +27,7 @@ class BugPolicy < ApplicationPolicy
   end
 
   def assign_to_self?
-    user.developer? && record.developer.nil? && record.project.users.include?(user)
+    user.developer? 
   end
 
   def mark_resolved?

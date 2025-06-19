@@ -1,0 +1,28 @@
+p style="color: green"
+  = notice
+
+- content_for :title, "Projects"
+h2 Bugs statictics
+ul
+  - @bug_counts.each do |type, count|
+    li
+      strong
+        = "#{type.humanize}: #{count}"
+
+h1 Assigned Projects
+
+table.table#projects
+  thead
+    tr
+      th scope="col"
+        strong Name
+      th scope="col"
+        strong Description
+      th scope="col"
+        strong Actions
+  tbody
+    - @projects.each do |project|
+      = render project
+
+div
+  = link_to "New project", new_project_path, class: "btn btn-dark"

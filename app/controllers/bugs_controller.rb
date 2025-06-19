@@ -1,5 +1,5 @@
 class BugsController < ApplicationController
-  before_action :set_project, only: [:new, :create]
+  before_action :set_project, only: [:new, :create, :edit, :update, :show, :index]
   before_action :set_bug, only: %i[show edit update destroy]
 
   # GET /bugs or /bugs.json
@@ -17,20 +17,46 @@ class BugsController < ApplicationController
 
   end
 
-  # GET /bugs/new
   def new
-    authorize Bug
-    # @bug = Bug.new
     @bug = @project.bugs.build
+    authorize @bug
   end
 
-  # GET /bugs/1/edit
+  # POST /bugs
+  def create
+    @bug = @project.bugs.build(bug_params)
+    @bug.creator = current_user
+    # debugger
+    authorize @bug
+    
+    if @bug.save
+      redirect_to project_bug_path(@project, @bug), notice: "Bug was successfully created."
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+
+  # PATCH/PUT /bugs/1 or /bugs/1.json
+  def update
+    @bug = Bug.find(params[:id])
+    authorize @bug
+    
+    if @bug.update(bug_params)
+      redirect_to project_bugs_path(@bug.project), notice: "Bug was successfully updated"
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+ # GET /bugs/1/edit
   def edit
   end
   
   def assign_user
     @bug = Bug.find(params[:id])
     authorize @bug, :assign_to_self?
+    
     if @bug.developer_id.nil? || @bug.developer_id != current_user.id
       @bug.update(developer: current_user) # Assign current_user as the developer
       redirect_to request.referrer || project_bugs_path, notice: "Bug successfully assigned to you."
@@ -46,44 +72,10 @@ class BugsController < ApplicationController
     redirect_to project_bugs_path, notice: "Bug marked as resolved"
   end
 
-  def create
-  @bug = @project.bugs.build(bug_params)  # Associate the bug with the selected project
-  authorize @bug
-  @bug.creator = current_user  # Set the creator as the logged-in user
-  respond_to do |format|
-    if @bug.save
-      format.html { redirect_to project_bug_path(@project, @bug), notice: "Bug was successfully created." }
-      format.json { render :show, status: :created, location: @bug }
-    else
-      format.html { render :new, status: :unprocessable_entity }
-      format.json { render json: @bug.errors, status: :unprocessable_entity}
-    end
-  end
-end
-
-  # PATCH/PUT /bugs/1 or /bugs/1.json
-  def update
-  @bug = Bug.find(params[:id])
-  authorize @bug
-    respond_to do |format|
-      if @bug.update(bug_params)
-        format.html { redirect_to project_bugs_path(@bug.project), notice: "Bug was successfully updated." }
-        format.json { render :show, status: :ok, location: @bug }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @bug.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
   # DELETE /bugs/1 or /bugs/1.json
   def destroy
     @bug.destroy
-
-    respond_to do |format|
-      format.html { redirect_to project_bugs_path(@bug.project), status: :see_other, notice: "Bug was successfully destroyed." }
-      format.json { head :no_content }
-    end
+    redirect_to project_bugs_path(@bug.project), status: :see_other, notice: "Bug was successfully destroyed."
   end
 
 
@@ -93,15 +85,30 @@ end
     @project = Project.find(params[:project_id])
     @bug = @project.bugs.find(params[:id])
   end
-
-   def set_project
-    @project = Project.find(params[:project_id])  # Find the project by project_id
-     rescue ActiveRecord::RecordNotFound
-    redirect_to projects_path, alert: "Project not found."
+  
+  def set_project
+    @project = Project.find(params[:project_id])
   end
 
-  # Only allow a list of trusted parameters through.
   def bug_params
-    params.require(:bug).permit(:title, :description, :project_id, :deadline, :bug_type, :creator_id, :developer_id, :status, :screenshot)
+    # First permit all attributes
+    permitted = params.require(:bug).permit(
+      :title,
+      :description,
+      :deadline,
+      :status,
+      :bug_type,
+      :developer_id,
+      :screenshot,
+    )
+  
+    # Convert string enum values to integers
+    if permitted[:bug_type].present? && permitted[:bug_type].is_a?(String)
+      permitted[:bug_type] = Bug.bug_types[permitted[:bug_type]] || permitted[:bug_type]
+    end
+  
+    # Remove project_id and creator_id as they should come from the URL/session
+    permitted.except(:project_id, :creator_id)
   end
+
 end

@@ -1,0 +1,66 @@
+<!-- In Ruby on Rails:
+
+### Concerns
+
+- **Purpose:** Concerns are modules designed to extract and share reusable code between models or controllers. They help keep your code DRY (Don't Repeat Yourself) by grouping related methods, validations, or callbacks that are used in multiple places.
+- **Usage:** Place concerns in the `app/models/concerns` or `app/controllers/concerns` directories. Include them in your models or controllers using `include`.
+- **Typical Use Cases:**
+    - Shared scopes or validations across multiple models.
+    - Common controller filters or helper methods.
+    - Extracting logic that doesn't belong to a single model/controller.
+
+**Example:**
+```ruby
+# app/models/concerns/archivable.rb
+module Archivable
+    extend ActiveSupport::Concern
+
+    included do
+        scope :archived, -> { where(archived: true) }
+    end
+
+    def archive!
+        update(archived: true)
+    end
+end
+
+# app/models/post.rb
+class Post < ApplicationRecord
+    include Archivable
+end
+```
+
+---
+
+### Services
+
+- **Purpose:** Service objects encapsulate business logic or processes that don't naturally fit into models or controllers. They help keep models and controllers focused and maintainable.
+- **Usage:** Typically placed in the `app/services` directory. Each service is a plain Ruby class, often with a single responsibility.
+- **Typical Use Cases:**
+    - Complex operations involving multiple models (e.g., payment processing, sending notifications).
+    - Interactions with external APIs.
+    - Data imports/exports or background jobs.
+
+**Example:**
+```ruby
+# app/services/user_signup_service.rb
+class UserSignupService
+    def initialize(user_params)
+        @user_params = user_params
+    end
+
+    def call
+        user = User.new(@user_params)
+        if user.save
+            WelcomeMailer.send_welcome_email(user).deliver_later
+        end
+        user
+    end
+end
+```
+
+---
+
+**Summary:**  
+- Use **concerns** for sharing reusable code across models or controllers.
+- Use **services** for encapsulating complex business logic or processes that don't belong in models or controllers. -->

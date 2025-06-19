@@ -1,22 +1,20 @@
 class User < ApplicationRecord
-  has_many :user_projects
-  has_many :projects, through: :user_projects
-
-  
-  # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+  :recoverable, :rememberable, :validatable
   
-         def manager?
-          self.role == "manager"
-         end
+  include DeviseTokenAuth::Concerns::User
 
-         def developer?
-          self.role == "developer"
-         end
+  has_many :user_projects
+  has_many :projects, through: :user_projects
+  include Loggs
 
-         def qa?
-          self.role == "qa"
-         end
+  before_destroy :user_project_destroy
+  
+  enum :role, { manager: 0, developer: 1, qa: 2 }
+
+  def user_project_destroy
+    self.user_projects.destroy_all
+  end
+
 end

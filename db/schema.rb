@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_06_190003) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_19_125512) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,8 +47,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_06_190003) do
     t.text "description"
     t.bigint "project_id", null: false
     t.datetime "deadline"
-    t.string "status", null: false
-    t.string "bug_type", null: false
+    t.integer "status", null: false
+    t.integer "bug_type", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "creator_id", null: false
@@ -84,9 +84,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_06_190003) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name"
-    t.string "role", default: "user"
+    t.integer "role", default: 1, null: false
+    t.string "provider", default: "email", null: false
+    t.string "uid", default: "", null: false
+    t.text "tokens"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

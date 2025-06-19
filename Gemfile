@@ -18,9 +18,18 @@ gem "stimulus-rails"
 gem "jbuilder"
 
 gem "devise"
+
+gem 'devise_token_auth', '~> 1.2', '>= 1.2.5'
+
 gem "rolify"
+
 gem "pundit"
+
 gem "sidekiq"
+
+gem "haml"
+
+gem 'slim-rails', '~> 3.7'
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
