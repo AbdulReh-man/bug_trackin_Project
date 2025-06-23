@@ -34,9 +34,6 @@ Rails.application.routes.draw do
     namespace :v1 do
       mount_devise_token_auth_for 'User', at: 'auth'
       devise_scope :user do
-        # post 'users/sign_up', to: 'registrations#create'
-        # delete 'users/sign_out', to: 'sessions#destroy'
-        # post 'users/sign_in', to: 'sessions#create'
         delete 'users/destroy_with_projects', to: 'users#destroy_with_projects'
       end
 

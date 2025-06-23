@@ -1,9 +1,10 @@
 module Api::V1
   class ApiBaseController < ActionController::API
     respond_to :json
-    
     include Pundit::Authorization
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
+    include DeviseTokenAuth::Concerns::SetUserByToken
     before_action :authenticate_user!
 
     before_action :configure_permitted_parameters, if: :devise_controller?
