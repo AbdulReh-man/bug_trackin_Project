@@ -6,6 +6,6 @@ module Loggs
   end
 
   def log_creation
-    Rails.logger.info "User #{self.name} created at #{self.created_at}"
+    Rails.logger.info "User #{self.username} created at #{self.created_at}"
   end
 end

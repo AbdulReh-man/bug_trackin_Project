@@ -1,14 +1,14 @@
 <h2 class="mt-5">Assign Users to Project: <%= @project.name %></h2>
 <%= form_with url: assign_users_project_path(@project), method: :post do |form| %>
   <div class="form-group my-3">
-     <h4>Available Users List</h4>
+    <h4>Available Users List</h4>
     <% @users.each do |user| %>
       <li class="form-check form-check-inline my-2">
         <%= check_box_tag "user_ids[]", user.id, @project.users.include?(user) %>
-        <%= label_tag "user_ids_#{user.id}", user.name %> (<%= user.role %>)
-      </li> |
+        <%= label_tag "user_ids_#{user.id}", user.username %> (<%= user.role %>)
+      </li>
+      |
     <% end %>
   </div>
   <%= submit_tag "Assign Users" , :class=>("btn btn-primary")%>
 <% end %>
-

@@ -9,18 +9,18 @@ module Api::V1
 
     before_action :configure_permitted_parameters, if: :devise_controller?
 
+    protected
+    
+    def configure_permitted_parameters
+      # added_attrs = [:username, :email, :password, :password_confirmation, :role]
+      devise_parameter_sanitizer.permit(:sign_up, keys: [:username])
+      devise_parameter_sanitizer.permit(:account_update, keys: [:username])
+    end
+
     private
 
     def render_error(message, status = :unprocessable_entity)
       render json: { error: message }, status: status
-    end
-
-    def user_not_authorized
-      render_error("You are not authorized to perform this action.", :forbidden)
-    end
-
-    def configure_permitted_parameters
-      devise_parameter_sanitizer.permit(:sign_up, keys: [:role, :name])
     end
 
   end

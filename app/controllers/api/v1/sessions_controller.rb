@@ -1,21 +1,45 @@
-# app/controllers/api/v1/sessions_controller.rb
 module Api::V1
-  class SessionsController < Devise::SessionsController
-    respond_to :json
+    class SessionsController < DeviseTokenAuth::SessionsController
+      def create
+        # Normalize parameters
+        auth_params = if params[:session].present?
+                       params.require(:session).permit(:email, :password)
+                     else
+                       params.permit(:email, :password)
+                     end
 
-    private
+        # Find user
+        @resource = User.find_for_database_authentication(login: auth_params[:email]&.downcase)
 
-    def respond_with(resource, _)
-      render json: {
-        status: { code: 200, message: 'Logged in successfully.' },
-        data: resource
-      }, status: :ok
-    end
+        # Validate credentials
+        unless @resource&.valid_password?(auth_params[:password])
+          return render json: {
+            success: false,
+            errors: ["Invalid login credentials. Please try again."]
+          }, status: :unauthorized
+        end
 
-    def respond_to_on_destroy
-      render json: {
-        status: { code: 200, message: 'Logged out successfully.' }
-      }, status: :ok
-    end
+        # Manually generate token response to avoid parameter issues
+        @token = @resource.create_token
+        @resource.save!
+
+        puts "Generated token: #{@token}"
+        
+
+        render json: {
+          data: @resource.as_json(),
+          # token: @token.token,
+          # token_type: 'Bearer',
+          # uid: @resource.uid,
+          # client_id: @token.client,
+          # expiry: @token.expiry
+        }
+      end
+
+      private
+
+      def resource_params
+        params.permit(:email, :password)
+      end
   end
 end

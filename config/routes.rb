@@ -32,10 +32,9 @@ Rails.application.routes.draw do
   # API routes
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      mount_devise_token_auth_for 'User', at: 'auth'
-      devise_scope :user do
-        delete 'users/destroy_with_projects', to: 'users#destroy_with_projects'
-      end
+      mount_devise_token_auth_for 'User', at: 'auth', controllers: {
+        sessions: "api/v1/sessions"
+      }
 
       # Projects API routes
       resources :projects, only: [:index, :show, :create, :update, :destroy] do
